@@ -1,4 +1,5 @@
 use axum::{extract::Path, routing::get, Json, Router};
+use hyper::Server; // Import Server from hyper
 use rust_axum_greedy_coin_microservice::greedy_coin_change;
 use serde_json::json;
 
@@ -27,7 +28,7 @@ async fn main() {
         .route("/change/{dollars}/{cents}", get(change)); // Change route with parameters
 
     // Run the server on 0.0.0.0:3000
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
