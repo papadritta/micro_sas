@@ -1,5 +1,5 @@
 # Build stage
-FROM rust:1.67 AS build
+FROM rust:1.84.0 AS build
 WORKDIR /app
 COPY . .
 RUN cargo build --release
