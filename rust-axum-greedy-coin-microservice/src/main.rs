@@ -1,7 +1,21 @@
 use axum::{extract::Path, routing::get, Json, Router};
-use hyper::Server; // Import Server from hyper
-use rust_axum_greedy_coin_microservice::greedy_coin_change;
 use serde_json::json;
+use std::net::SocketAddr;
+
+// Greedy algorithm to calculate coin change
+fn greedy_coin_change(amount: u32) -> Vec<u32> {
+    let coins = [25, 10, 5, 1]; // Coin denominations
+    let mut amount = amount;
+    let mut result = vec![];
+
+    for &coin in &coins {
+        let count = amount / coin;
+        result.push(count);
+        amount %= coin;
+    }
+
+    result
+}
 
 // Root route for the Change Machine
 async fn root() -> &'static str {
@@ -27,8 +41,12 @@ async fn main() {
         .route("/", get(root)) // Root route
         .route("/change/{dollars}/{cents}", get(change)); // Change route with parameters
 
-    // Run the server on 0.0.0.0:3000
-    Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    // Define the address
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    println!("Listening on http://{}", addr);
+
+    // Serve the application using axum_server
+    axum_server::bind(addr)
         .serve(app.into_make_service())
         .await
         .unwrap();
