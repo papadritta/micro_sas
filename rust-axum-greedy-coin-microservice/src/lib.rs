@@ -1,39 +1,48 @@
-/* Greedy Coin Change Logic*/
+// Greedy algorithm for coin change
+pub fn greedy_coin_change(amount: i64) -> Vec<u32> {
+    let coins: [u32; 4] = [25, 10, 5, 1]; // Coin denominations
+    let mut amount = amount.abs() as u32; // Take absolute value for negative inputs
+    let mut result: Vec<u32> = vec![];
 
-pub fn greedy_coin_change(amount: u32) -> Vec<u32> {
-    let mut coins = vec![1, 5, 10, 25];
-    coins.sort();
-    coins.reverse();
-
-    let mut change = vec![];
-    let mut remaining = amount;
-
-    for coin in coins {
-        while remaining >= coin {
-            remaining -= coin;
-            change.push(coin);
-        }
+    for &coin in &coins {
+        let count = amount / coin;
+        result.push(count);
+        amount %= coin;
     }
 
-    change
+    // Ensure the result has the correct number of elements
+    while result.len() < 4 {
+        result.push(0);
+    }
+
+    result
 }
 
-//test
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
-    fn test_greedy_coin_change() {
-        assert_eq!(greedy_coin_change(0), vec![]);
-        assert_eq!(greedy_coin_change(1), vec![1]);
-        assert_eq!(greedy_coin_change(5), vec![5]);
-        assert_eq!(greedy_coin_change(10), vec![10]);
-        assert_eq!(greedy_coin_change(25), vec![25]);
-        assert_eq!(greedy_coin_change(26), vec![25, 1]);
-        assert_eq!(greedy_coin_change(27), vec![25, 1, 1]);
-        assert_eq!(greedy_coin_change(28), vec![25, 1, 1, 1]);
-        assert_eq!(greedy_coin_change(29), vec![25, 1, 1, 1, 1]);
-        assert_eq!(greedy_coin_change(30), vec![25, 25]);
-        assert_eq!(greedy_coin_change(31), vec![25, 25, 1]);
+    fn test_standard_cases() {
+        // $1.32 (132 cents)
+        assert_eq!(greedy_coin_change(132), vec![5, 0, 1, 2]);
+
+        // $0.00 (0 cents)
+        assert_eq!(greedy_coin_change(0), vec![0, 0, 0, 0]);
+
+        // $2.41 (241 cents)
+        assert_eq!(greedy_coin_change(241), vec![9, 1, 1, 1]);
+    }
+
+    #[test]
+    fn test_edge_cases() {
+        // Large value: $10.99 (1099 cents)
+        assert_eq!(greedy_coin_change(1099), vec![43, 2, 0, 4]);
+
+        // Negative value: -$0.75 (negative 75 cents)
+        assert_eq!(greedy_coin_change(-75), vec![3, 0, 0, 0]);
+
+        // Small value: $0.04 (4 cents)
+        assert_eq!(greedy_coin_change(4), vec![0, 0, 0, 4]);
     }
 }
